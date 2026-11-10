@@ -1,0 +1,190 @@
+================================================================================
+UNIVERSIDADE ESTADUAL DO SUDOESTE DA BAHIA - UESB
+DEPARTAMENTO DE CIÊNCIAS EXATAS - DCET
+CURSO: CIÊNCIA DA COMPUTAÇÃO
+DISCIPLINA: COMPILADORES (2026.2)
+DOCENTE: PROF. JOSÉ CARLOS MARTINS OLIVEIRA
+DISCENTE: GUILHERME DIAS SOUSA
+================================================================================
+FORMALIZAÇÃO DA GRAMÁTICA LIVRE DE CONTEXTO: G = (V, T, P, S)
+Linguagem Mini_Pascal (Trabalho Prático - Compiladores)
+================================================================================
+
+1. INTRODUÇÃO E DEFINIÇÃO FORMAL
+--------------------------------------------------------------------------------
+Uma Gramática Livre de Contexto (GLC) é formalmente definida por uma 4-tupla:
+    G = (V, T, P, S)
+Onde:
+    - V: Conjunto finito de símbolos Não-Terminais (variáveis sintáticas).
+    - T: Conjunto finito de símbolos Terminais (tokens e itens léxicos da linguagem),
+         sendo V ∩ T = ∅.
+    - P: Conjunto finito de Regras de Produção da forma A -> α, onde A ∈ V e
+         α ∈ (V ∪ T)*. O símbolo ε (épsilon) representa a cadeia vazia.
+    - S: Símbolo Inicial da gramática, onde S ∈ V (neste caso, S = PROG).
+
+A especificação original fornecida na proposta do trabalho utiliza a notação
+BNF Estendida (EBNF) contendo metasímbolos de opcionalidade [A], fecho de Kleene {B}*,
+fecho positivo {C}+ e intercalação {C || D}+. 
+Neste documento, todos os metasímbolos EBNF foram convertidos em regras puras de
+Gramática Livre de Contexto (GLC) com regras recursivas e produções-ε.
+
+
+2. CONJUNTO DE SÍMBOLOS TERMINAIS: T
+--------------------------------------------------------------------------------
+O conjunto T é composto pelos itens léxicos (palavras reservadas, símbolos especiais,
+delimitadores e operadores) e pelas classes léxicas retornadas pelo analisador léxico:
+
+T = {
+    /* Palavras Reservadas */
+    "program", "var", "procedure", "begin", "end",
+    "if", "then", "else", "while", "do", "div", "mod",
+
+    /* Delimitadores e Pontuação */
+    ";", ".", ":", ",", "(", ")",
+
+    /* Operadores de Atribuição e Relacionais */
+    ":=", "=", "<", ">", "<>", "<=", ">=",
+
+    /* Operadores Aritméticos */
+    "+", "-", "*",
+
+    /* Classes Léxicas (Tokens fornecidos pelo Léxico) */
+    ident, tipo, proc, numero, variavel
+}
+
+
+3. CONJUNTO DE SÍMBOLOS NÃO-TERMINAIS: V
+--------------------------------------------------------------------------------
+O conjunto V é composto pelos não-terminais da gramática original expandidos com os
+símbolos auxiliares necessários para eliminar os operadores EBNF:
+
+V = {
+    /* Não-Terminais Originais */
+    PROG, BLOCO, PALIST, COMANDO, EXPR, SIEXPR, TERMO, FATOR,
+
+    /* Auxiliares para o BLOCO */
+    SECAO_VAR, LISTA_DECL_VAR, DECL_VAR, LISTA_IDENT, RESTO_IDENT,
+    SECAO_PROC, DECL_PROC, LISTA_COMANDOS, RESTO_COMANDOS,
+
+    /* Auxiliares para PALIST (Lista de Parâmetros) */
+    LISTA_PARAM, RESTO_PARAM, SECAO_PARAM, OPC_VAR, LISTA_ID_PARAM, RESTO_ID_PARAM,
+
+    /* Auxiliares para COMANDO */
+    CHAMADA_PROC, LISTA_EXPR, RESTO_EXPR, ELSE_OPC,
+
+    /* Auxiliares para EXPR (Expressões e Relacionais) */
+    OPC_REL, OP_REL,
+
+    /* Auxiliares para SIEXPR (Expressões Simples e Adição) */
+    OPC_SINAL, RESTO_TERMO, OP_AD,
+
+    /* Auxiliares para TERMO (Multiplicação e Divisão) */
+    RESTO_FATOR, OP_MULT
+}
+
+Total de símbolos não-terminais: |V| = 28.
+
+
+4. SÍMBOLO INICIAL: S
+--------------------------------------------------------------------------------
+S = PROG
+
+
+5. CONJUNTO DE REGRAS DE PRODUÇÃO: P
+--------------------------------------------------------------------------------
+
+[Programa Principal]
+  (1)  PROG               -> "program" ident ";" BLOCO "."
+
+[Estrutura do Bloco]
+  (2)  BLOCO              -> SECAO_VAR SECAO_PROC "begin" LISTA_COMANDOS "end"
+
+[Seção de Variáveis: { "var" { ident {"," ident}* ":" tipo ";" }+ }*]
+  (3)  SECAO_VAR          -> "var" LISTA_DECL_VAR SECAO_VAR
+  (4)  SECAO_VAR          -> ε
+  (5)  LISTA_DECL_VAR     -> DECL_VAR LISTA_DECL_VAR
+  (6)  LISTA_DECL_VAR     -> DECL_VAR
+  (7)  DECL_VAR           -> LISTA_IDENT ":" tipo ";"
+  (8)  LISTA_IDENT        -> ident RESTO_IDENT
+  (9)  RESTO_IDENT        -> "," ident RESTO_IDENT
+  (10) RESTO_IDENT        -> ε
+
+[Seção de Procedimentos: {"procedure" ident PALIST ";" BLOCO ";"}*]
+  (11) SECAO_PROC         -> DECL_PROC SECAO_PROC
+  (12) SECAO_PROC         -> ε
+  (13) DECL_PROC          -> "procedure" ident PALIST ";" BLOCO ";"
+
+[Lista de Parâmetros Formais: PALIST -> [ "(" { ... } || ";" }+ ")" ]]
+  (14) PALIST             -> "(" LISTA_PARAM ")"
+  (15) PALIST             -> ε
+  (16) LISTA_PARAM        -> SECAO_PARAM RESTO_PARAM
+  (17) RESTO_PARAM        -> ";" SECAO_PARAM RESTO_PARAM
+  (18) RESTO_PARAM        -> ε
+  (19) SECAO_PARAM        -> OPC_VAR LISTA_ID_PARAM ":" tipo
+  (20) OPC_VAR            -> "var"
+  (21) OPC_VAR            -> ε
+  (22) LISTA_ID_PARAM     -> ident RESTO_ID_PARAM
+  (23) RESTO_ID_PARAM     -> "," ident RESTO_ID_PARAM
+  (24) RESTO_ID_PARAM     -> ε
+
+[Lista de Comandos: {COMANDO ";"}+]
+  (25) LISTA_COMANDOS     -> COMANDO ";" RESTO_COMANDOS
+  (26) RESTO_COMANDOS     -> COMANDO ";" RESTO_COMANDOS
+  (27) RESTO_COMANDOS     -> ε
+
+[Comandos]
+  (28) COMANDO            -> variavel ":=" EXPR
+  (29) COMANDO            -> proc CHAMADA_PROC
+  (30) COMANDO            -> "if" EXPR "then" COMANDO ELSE_OPC
+  (31) COMANDO            -> "while" EXPR "do" COMANDO
+  (32) COMANDO            -> "begin" LISTA_COMANDOS "end"
+
+[Chamada de Procedimento e Lista de Argumentos]
+  (33) CHAMADA_PROC       -> "(" LISTA_EXPR ")"
+  (34) CHAMADA_PROC       -> ε
+  (35) LISTA_EXPR         -> EXPR RESTO_EXPR
+  (36) RESTO_EXPR         -> "," EXPR RESTO_EXPR
+  (37) RESTO_EXPR         -> ε
+
+[Cláusula Else Opcional]
+  (38) ELSE_OPC           -> "else" COMANDO
+  (39) ELSE_OPC           -> ε
+
+[Expressões: EXPR -> SIEXPR [(relop) SIEXPR]]
+  (40) EXPR               -> SIEXPR OPC_REL
+  (41) OPC_REL            -> OP_REL SIEXPR
+  (42) OPC_REL            -> ε
+  (43) OP_REL             -> "="
+  (44) OP_REL             -> "<"
+  (45) OP_REL             -> ">"
+  (46) OP_REL             -> "<>"
+  (47) OP_REL             -> "<="
+  (48) OP_REL             -> ">="
+
+[Expressão Simples: SIEXPR -> ["+" | "-"] {TERMO || "+" | "-"}+]
+  (49) SIEXPR             -> OPC_SINAL TERMO RESTO_TERMO
+  (50) OPC_SINAL          -> "+"
+  (51) OPC_SINAL          -> "-"
+  (52) OPC_SINAL          -> ε
+  (53) RESTO_TERMO        -> OP_AD TERMO RESTO_TERMO
+  (54) RESTO_TERMO        -> ε
+  (55) OP_AD              -> "+"
+  (56) OP_AD              -> "-"
+
+[Termo: TERMO -> {FATOR || "*" | "div" | "mod"}+]
+  (57) TERMO              -> FATOR RESTO_FATOR
+  (58) RESTO_FATOR        -> OP_MULT FATOR RESTO_FATOR
+  (59) RESTO_FATOR        -> ε
+  (60) OP_MULT            -> "*"
+  (61) OP_MULT            -> "div"
+  (62) OP_MULT            -> "mod"
+
+[Fator: FATOR -> numero | variavel | "(" EXPR ")"]
+  (63) FATOR              -> numero
+  (64) FATOR              -> variavel
+  (65) FATOR              -> "(" EXPR ")"
+
+================================================================================
+Trabalho elaborado por: GUILHERME DIAS SOUSA
+Disciplina: Compiladores - UESB
+================================================================================

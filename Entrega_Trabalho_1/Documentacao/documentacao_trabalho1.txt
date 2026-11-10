@@ -1,0 +1,144 @@
+================================================================================
+UNIVERSIDADE ESTADUAL DO SUDOESTE DA BAHIA - UESB
+DEPARTAMENTO DE CIÊNCIAS EXATAS - DCET
+CURSO: CIÊNCIA DA COMPUTAÇÃO
+DISCIPLINA: COMPILADORES (2026.2)
+DOCENTE: PROF. JOSÉ CARLOS MARTINS OLIVEIRA
+DISCENTE: GUILHERME DIAS SOUSA
+================================================================================
+RELATÓRIO TÉCNICO E DOCUMENTAÇÃO DO TRABALHO PRÁTICO DA I UNIDADE
+IMPLEMENTAÇÃO DO ANALISADOR LÉXICO (LINGUAGEM MINI_PASCAL)
+================================================================================
+
+1. INTRODUÇÃO E ESPECIFICAÇÃO DO PROJETO
+--------------------------------------------------------------------------------
+Este projeto consiste no desenvolvimento de um Analisador Léxico completo para
+uma versão simplificada da linguagem Pascal (Mini_Pascal), desenvolvido em C#
+(.NET 10.0 Windows Forms) em estrita conformidade com os requisitos estipulados
+na disciplina de Compiladores da UESB.
+
+O software foi construído tendo como alicerce teórico um Autômato Finito Determinístico
+(AFD) rigorosamente modelado para reconhecer todas as classes de palavras reservadas,
+identificadores, números inteiros, números reais (incluindo notação científica),
+constantes literais (strings e caracteres), operadores e delimitadores, além de
+descartar explicitamente comentários de bloco (/* ... */) e caracteres de espaçamento.
+
+
+2. INSTRUÇÕES DE INSTALAÇÃO E EXECUÇÃO
+--------------------------------------------------------------------------------
+A) Requisitos do Sistema:
+   - Sistema Operacional: Microsoft Windows 10 ou Windows 11.
+   - Ambiente de Execução: .NET 10.0 Runtime instalado (ou execução direta via terminal).
+
+B) Execução com Interface Gráfica (Recomendado):
+   1. Navegue até a pasta 'executavel' na raiz do projeto.
+   2. Execute com duplo clique o arquivo 'MiniPascalLexer.exe'.
+   3. A interface gráfica intuitiva será aberta exibindo:
+      - Editor e visualizador de código-fonte Mini_Pascal à esquerda.
+      - Tabela estruturada de tokens reconhecidos à direita (<Lexema, Token>).
+      - Painel de diagnósticos com contagem e descrição precisa de erros léxicos.
+      - Menu "Exemplos de Teste" para carregar instantaneamente os 5 testes pré-definidos.
+      - Botão "Abrir Código (.txt)" para carregar qualquer programa externo.
+      - Botão "Salvar Tokens (.txt)" para exportar a listagem final no formato padrão.
+
+C) Execução via Linha de Comando (Modo Batch / CLI):
+   O programa suporta execução direta via terminal para automação de testes:
+       MiniPascalLexer.exe <arquivo_entrada.txt> <arquivo_saida.txt>
+   Exemplo:
+       dotnet run --project MiniPascalLexer -- ../testes/teste1_exemplo1.txt saida.txt
+
+
+3. RESPOSTAS ÀS DECISÕES DE PROJETO E IMPLEMENTAÇÃO (Página 2 do PDF)
+--------------------------------------------------------------------------------
+a) Vai existir um limite para o tamanho dos identificadores?
+   Resposta:
+   Não há limite artificial restritivo rígido que cause truncamento arbitrário.
+   O analisador aceita identificadores de comprimento padrão em compiladores modernos
+   (suportando até 255 caracteres sem perda de desempenho). Caso ultrapasse 255 caracteres,
+   o analisador emite um aviso no painel de diagnósticos, mantendo a integridade léxica.
+
+b) Quais os tokens para as cadeias: <palavra_reservada, palavra_reservada> ou
+   <palavra_reservada, t_palavra_reservada>?
+   Resposta:
+   Adotou-se o padrão exato demonstrado no exemplo de execução do documento do professor
+   (páginas 3 e 4 do PDF), gerando a classificação amigável por linha:
+   Exemplos:
+       program Palavra reservada
+       teste Identificador
+       := Atribuição
+       3.1416 Número real
+       ; Símbolo especial
+       writeln Identificador
+       . Fim
+
+c) Como implementar a tabela de palavras reservadas/símbolos?
+   Resposta:
+   A tabela foi implementada através da classe 'SymbolTable' utilizando a estrutura de
+   dados 'Dictionary<string, TokenType>' da biblioteca padrão do .NET.
+   Esta estrutura é baseada em tabela Hash interna de alta performance, garantindo
+   complexidade de busca O(1) em tempo constante. A tabela é instanciada e populada
+   uma única vez na inicialização do compilador com todas as 47 palavras reservadas
+   especificadas no trabalho, operando de forma 'case-insensitive' (insensível a
+   diferenças entre maiúsculas e minúsculas).
+
+d) As informações que ficarão na tabela de símbolos serão inseridas pelo analisador
+   léxico ou sintático?
+   Resposta:
+   O analisador léxico realiza o primeiro povoamento da tabela de símbolos ao registrar
+   a primeira ocorrência de cada novo identificador reconhecido (associando lexema e
+   posição inicial). As informações semânticas e contextuais (tipo de dado, escopo local/global,
+   endereçamento e parâmetros de procedimentos) serão enriquecidas posteriormente pelo
+   analisador sintático e semântico (Unidade II), garantindo separação limpa de responsabilidades.
+
+e) Como serão tratados os erros léxicos?
+   Resposta:
+   Adotou-se a estratégia de recuperação por pânico/descarte local ("panic mode"):
+   Ao deparar-se com um caractere não reconhecido pelo alfabeto Σ ou com um literal/comentário
+   malformado, o analisador:
+   1. Gera um registro de erro específico contendo número da linha, coluna e causa detalhada.
+   2. Insere o token classificado como 'ERRO LÉXICO' na listagem para rastreabilidade.
+   3. Descarta o caractere inválido e sincroniza imediatamente o ponteiro no próximo caractere,
+      retornando ao estado inicial q0 sem interromper ou abortar a compilação do restante do código.
+
+
+4. BATERIA DE TESTES REALIZADOS
+--------------------------------------------------------------------------------
+Foram elaborados e validados 5 arquivos de teste contidos no diretório 'testes/':
+
+- teste1_exemplo1.txt:
+  Reprodução fiel do primeiro exemplo do PDF (declarações de var, const, if/else, read, write).
+  Resultado: 50 tokens reconhecidos | 0 erros | 100% de conformidade com o gabarito.
+
+- teste2_exemplo2.txt:
+  Reprodução fiel do programa 'Piloto' do PDF (laços for, cálculo de médias, reais e strings).
+  Resultado: 108 tokens reconhecidos | 0 erros.
+
+- teste3_estruturas.txt:
+  Validação de estruturas adicionais especificadas (while-do, repeat-until, constantes char
+  delimitadas por aspas simples, constantes string e operadores lógicos and, or, not).
+  Resultado: 72 tokens reconhecidos | 0 erros.
+
+- teste4_operadores.txt:
+  Teste exaustivo de operadores relacionais (=, <>, <=, >=, <, >), aritméticos (+, -, *, /, mod, div)
+  e números reais em notação científica com expoente (ex.: 24.40e-04).
+  Resultado: 69 tokens reconhecidos | 0 erros.
+
+- teste5_erros.txt:
+  Teste de estresse e resiliência léxica contendo caracteres inválidos (@, $), strings abertas,
+  constante caractere com múltiplos caracteres e expoente científico sem dígitos.
+  Resultado: 36 tokens processados | 5 erros léxicos detectados com precisão de linha e coluna.
+
+
+5. ESTRUTURA DO CÓDIGO-FONTE
+--------------------------------------------------------------------------------
+- MiniPascalLexer/Lexer/TokenType.cs: Enumeração das categorias léxicas e extensões amigáveis.
+- MiniPascalLexer/Lexer/Token.cs: Classe do token com propriedades de posição e formatação de saída.
+- MiniPascalLexer/Lexer/SymbolTable.cs: Tabela Hash de palavras reservadas e identificadores O(1).
+- MiniPascalLexer/Lexer/AfdLexer.cs: Motor de execução baseado nos estados do AFD.
+- MiniPascalLexer/UI/MainForm.cs: Interface gráfica interativa Windows Forms.
+- MiniPascalLexer/Program.cs: Ponto de entrada híbrido (GUI e CLI).
+
+================================================================================
+Trabalho elaborado por: GUILHERME DIAS SOUSA
+Disciplina: Compiladores - UESB
+================================================================================

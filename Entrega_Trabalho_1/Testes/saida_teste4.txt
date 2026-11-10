@@ -1,0 +1,69 @@
+﻿program Palavra reservada
+OperadoresEOperacoes Identificador
+; Símbolo especial
+var Palavra reservada
+n1 Identificador
+, Símbolo especial
+n2 Identificador
+, Símbolo especial
+resultado Identificador
+: Símbolo especial
+real Palavra reservada
+; Símbolo especial
+r_int Identificador
+: Símbolo especial
+integer Palavra reservada
+; Símbolo especial
+flag Identificador
+: Símbolo especial
+integer Palavra reservada
+; Símbolo especial
+begin Palavra reservada
+n1 Identificador
+:= Atribuição
+24.40e-04 Número real
+; Símbolo especial
+n2 Identificador
+:= Atribuição
+1.33 Número real
+; Símbolo especial
+resultado Identificador
+:= Atribuição
+( Símbolo especial
+n1 Identificador
++ Operador aritmético
+n2 Identificador
+) Símbolo especial
+* Operador aritmético
+5.0 Número real
+/ Operador aritmético
+2.0 Número real
+; Símbolo especial
+r_int Identificador
+:= Atribuição
+10 Número inteiro
+mod Operador aritmético
+3 Número inteiro
+; Símbolo especial
+if Palavra reservada
+( Símbolo especial
+n1 Identificador
+>= Operador relacional
+n2 Identificador
+and Operador lógico
+n2 Identificador
+<> Operador relacional
+0.0 Número real
+) Símbolo especial
+then Palavra reservada
+flag Identificador
+:= Atribuição
+1 Número inteiro
+; Símbolo especial
+else Palavra reservada
+flag Identificador
+:= Atribuição
+0 Número inteiro
+; Símbolo especial
+end Palavra reservada
+. Fim

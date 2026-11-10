@@ -1,0 +1,72 @@
+﻿program Palavra reservada
+EstruturasDeControle Identificador
+; Símbolo especial
+var Palavra reservada
+a Identificador
+, Símbolo especial
+b Identificador
+, Símbolo especial
+cont Identificador
+: Símbolo especial
+integer Palavra reservada
+; Símbolo especial
+letra Identificador
+: Símbolo especial
+char Palavra reservada
+; Símbolo especial
+msg Identificador
+: Símbolo especial
+string Palavra reservada
+; Símbolo especial
+begin Palavra reservada
+letra Identificador
+:= Atribuição
+'A' Constante caractere
+; Símbolo especial
+msg Identificador
+:= Atribuição
+"Testando repeticoes e condicionais" Constante string
+; Símbolo especial
+a Identificador
+:= Atribuição
+1 Número inteiro
+; Símbolo especial
+b Identificador
+:= Atribuição
+10 Número inteiro
+; Símbolo especial
+while Palavra reservada
+( Símbolo especial
+a Identificador
+< Operador relacional
+b Identificador
+) Símbolo especial
+do Palavra reservada
+begin Palavra reservada
+a Identificador
+:= Atribuição
+a Identificador
++ Operador aritmético
+1 Número inteiro
+; Símbolo especial
+end Palavra reservada
+; Símbolo especial
+repeat Palavra reservada
+b Identificador
+:= Atribuição
+b Identificador
+- Operador aritmético
+1 Número inteiro
+; Símbolo especial
+until Palavra reservada
+( Símbolo especial
+b Identificador
+<= Operador relacional
+0 Número inteiro
+or Operador lógico
+not Operador lógico
+a Identificador
+) Símbolo especial
+; Símbolo especial
+end Palavra reservada
+. Fim

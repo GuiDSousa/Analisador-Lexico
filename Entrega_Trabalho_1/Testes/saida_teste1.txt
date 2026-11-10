@@ -1,0 +1,50 @@
+﻿program Palavra reservada
+teste Identificador
+; Símbolo especial
+var Palavra reservada
+x Identificador
+, Símbolo especial
+y Identificador
+: Símbolo especial
+integer Palavra reservada
+; Símbolo especial
+const Palavra reservada
+pi Identificador
+:= Atribuição
+3.1416 Número real
+; Símbolo especial
+begin Palavra reservada
+read Identificador
+( Símbolo especial
+x Identificador
+) Símbolo especial
+; Símbolo especial
+if Palavra reservada
+( Símbolo especial
+x Identificador
+> Operador relacional
+y Identificador
+) Símbolo especial
+then Palavra reservada
+y Identificador
+:= Atribuição
+x Identificador
+; Símbolo especial
+else Palavra reservada
+y Identificador
+:= Atribuição
+- Operador aritmético
+x Identificador
+; Símbolo especial
+writeln Identificador
+( Símbolo especial
+x Identificador
+) Símbolo especial
+; Símbolo especial
+write Identificador
+( Símbolo especial
+y Identificador
+) Símbolo especial
+; Símbolo especial
+end Palavra reservada
+. Fim

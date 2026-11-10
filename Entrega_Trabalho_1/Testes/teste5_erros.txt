@@ -1,0 +1,10 @@
+program TesteDeErros;
+var x, y: integer;
+/* Comentario de bloco fechado corretamente */
+begin
+x := 10 @ 20;
+y := 5 $ 2;
+str := "esta string nao fecha antes do fim
+ch := 'caractere_longo_invalido';
+num_ruim := 12.34e+;
+end.

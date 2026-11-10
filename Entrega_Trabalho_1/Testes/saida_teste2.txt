@@ -1,0 +1,108 @@
+﻿Program Palavra reservada
+Piloto Identificador
+; Símbolo especial
+var Palavra reservada
+cont Identificador
+, Símbolo especial
+total Identificador
+: Símbolo especial
+integer Palavra reservada
+; Símbolo especial
+Nota1 Identificador
+, Símbolo especial
+Nota2 Identificador
+, Símbolo especial
+Media_das_medias Identificador
+, Símbolo especial
+med Identificador
+: Símbolo especial
+real Palavra reservada
+; Símbolo especial
+begin Palavra reservada
+media_das_medias Identificador
+:= Atribuição
+0 Número inteiro
+; Símbolo especial
+writeln Identificador
+( Símbolo especial
+"******** ENTRADA DE DADOS ***************" Constante string
+) Símbolo especial
+; Símbolo especial
+writeln Identificador
+( Símbolo especial
+"Digite o total de alunos" Constante string
+) Símbolo especial
+; Símbolo especial
+read Identificador
+( Símbolo especial
+total Identificador
+) Símbolo especial
+; Símbolo especial
+for Palavra reservada
+cont Identificador
+= Operador relacional
+1 Número inteiro
+to Palavra reservada
+total Identificador
+do Palavra reservada
+begin Palavra reservada
+writeln Identificador
+( Símbolo especial
+"Digite os valores da primeira nota do aluno " Constante string
+, Símbolo especial
+cont Identificador
+) Símbolo especial
+; Símbolo especial
+read Identificador
+( Símbolo especial
+Nota1 Identificador
+) Símbolo especial
+; Símbolo especial
+writeln Identificador
+( Símbolo especial
+"Digite os valores da segunda nota do aluno " Constante string
+, Símbolo especial
+cont Identificador
+) Símbolo especial
+; Símbolo especial
+read Identificador
+( Símbolo especial
+Nota2 Identificador
+) Símbolo especial
+; Símbolo especial
+med Identificador
+:= Atribuição
+( Símbolo especial
+Nota1 Identificador
++ Operador aritmético
+Nota2 Identificador
+) Símbolo especial
+/ Operador aritmético
+2.0 Número real
+; Símbolo especial
+media_das_medias Identificador
+:= Atribuição
+media_das_medias Identificador
++ Operador aritmético
+med Identificador
+; Símbolo especial
+write Identificador
+( Símbolo especial
+"Media = " Constante string
+, Símbolo especial
+med Identificador
+) Símbolo especial
+; Símbolo especial
+end Palavra reservada
+; Símbolo especial
+write Identificador
+( Símbolo especial
+"Media Geral = " Constante string
+, Símbolo especial
+Media_das_medias Identificador
+/ Operador aritmético
+total Identificador
+) Símbolo especial
+; Símbolo especial
+end Palavra reservada
+. Fim

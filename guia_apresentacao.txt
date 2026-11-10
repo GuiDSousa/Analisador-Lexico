@@ -1,0 +1,103 @@
+================================================================================
+UNIVERSIDADE ESTADUAL DO SUDOESTE DA BAHIA - UESB
+DEPARTAMENTO DE CIÊNCIAS EXATAS - DCET
+CURSO: CIÊNCIA DA COMPUTAÇÃO
+DISCIPLINA: COMPILADORES (2026.2)
+DOCENTE: PROF. JOSÉ CARLOS MARTINS OLIVEIRA
+DISCENTE: GUILHERME DIAS SOUSA
+================================================================================
+GUIA PRÁTICO PARA DEFESA E APRESENTAÇÃO ORAL
+ANALISADOR LÉXICO DA LINGUAGEM MINI_PASCAL
+================================================================================
+
+1. ROTEIRO CRONOMETRADO DA APRESENTAÇÃO (5 A 7 MINUTOS)
+--------------------------------------------------------------------------------
+
+[0:00 - 1:00] PARTE 1: ABERTURA E ESCOPO DO PROJETO
+- Cumprimente o professor e os colegas.
+- "Apresento o Analisador Léxico da linguagem Mini_Pascal desenvolvido para a I Unidade."
+- "O objetivo é ler o código-fonte, descartar brancos e comentários de bloco (/* ... */),
+  agrupando os caracteres em lexemas e classificando-os em pares <lexema, token>."
+- "A implementação foi realizada em C# (.NET 10.0 Windows Forms) com suporte a modo batch."
+
+[1:00 - 2:30] PARTE 2: FUNDAMENTAÇÃO TEÓRICA E O AUTÔMATO (AFD)
+- Apresente o diagrama visual do autômato (diagrama_afd.png).
+- Destaque as principais trilhas de reconhecimento:
+  1. Identificadores e Palavras Reservadas: padrão [a-zA-Z_][a-zA-Z0-9_]*.
+  2. Números Inteiros e Reais: incluindo parte fracionária e notação científica (24.40e-04).
+  3. Strings ("...") e Caracteres ('...').
+  4. Comentários de Bloco: ciclo q0 -> q1 -> q2 -> q3 -> q0 para descarte de /* ... */.
+  5. Relacionais e Atribuição: diferenciação entre ':' e ':=', '<', '<=', '<>'.
+- Enfatize o conceito de Retração / Lookahead (*):
+  "Estados com asterisco (*) indicam leitura antecipada de 1 caractere para confirmar
+  o término do token. Esse delimitador é devolvido ao fluxo para o próximo token."
+
+[2:30 - 3:30] PARTE 3: ARQUITETURA E DECISÕES DE PROJETO
+- Tabela Hash O(1) de Palavras Reservadas:
+  "Para manter o autômato simples e performático, unificamos identificadores e palavras
+  reservadas no mesmo ramo. No estado de aceitação q_id_final, consultamos um Dictionary
+  com as 47 palavras reservadas em tempo O(1)."
+- Tratamento de Erros Léxicos em Modo Pânico:
+  "O compilador não trava ao encontrar caracteres inválidos (@, $); ele registra o erro
+  com linha e coluna, descarta o símbolo e continua a análise dos demais tokens."
+
+[3:30 - 5:30] PARTE 4: DEMONSTRAÇÃO PRÁTICA AO VIVO NA APLICAÇÃO
+1. Abra o executável 'MiniPascalLexer.exe'.
+2. No menu 'Exemplos de Teste', selecione 'Exemplo 1 do PDF' e clique em 'Executar Análise Léxica':
+   - Aponte a tabela gerada: 50 tokens reconhecidos, 0 erros, exatamente igual ao gabarito do PDF.
+3. Selecione 'Exemplo 2 do PDF' (Programa Piloto):
+   - Mostre o reconhecimento de números reais, constantes strings e laço for.
+4. Selecione 'Exemplo 5 (tratamento de erros léxicos)':
+   - Mostre o painel vermelho destacando erros nas linhas 5, 6, 7 e 8, provando que o
+     compilador identificou todos os problemas sem interromper a execução até o 'end.'.
+5. Demonstre o botão 'Salvar Tokens (.txt)', mostrando a geração do arquivo final.
+
+[5:30 - 6:00] PARTE 5: ENCERRAMENTO
+- Ressalte o cumprimento de 100% dos requisitos do edital e abra espaço para perguntas.
+
+
+2. PRINCIPAIS PERGUNTAS DO PROFESSOR E RESPOSTAS PRONTAS
+--------------------------------------------------------------------------------
+
+Pergunta 1: "Por que usar uma Tabela Hash em vez de colocar todas as palavras
+reservadas como ramos no AFD?"
+Resposta:
+"Construir ramos específicos para cada uma das 47 palavras reservadas inflaria o autômato
+para centenas de estados sem ganho prático. A literatura clássica (Livro do Dragão - Aho/Ullman)
+recomenda unificar o reconhecimento léxico no padrão alfanumérico e realizar a diferenciação
+no estado final com busca O(1) em Tabela Hash pré-populada."
+
+Pergunta 2: "O que é o lookahead e por que precisamos da retração com asterisco (*)?"
+Resposta:
+"Como a linguagem aceita comandos sem espaços (ex.: 'x:=10;'), o autômato só sabe que 'x'
+terminou ao ler o ':'. Como os dois-pontos pertencem ao próximo token, o ponteiro de leitura
+é retraído em 1 posição para que esse caractere seja analisado no token seguinte."
+
+Pergunta 3: "Como o autômato garante o descarte correto de comentários de bloco?"
+Resposta:
+"Ao ler '/*' o autômato entra no ciclo q1 -> q2 e consome todo o conteúdo até ler '*/'
+(q3 -> q0), retornando ao estado neutro inicial sem emitir tokens. Caso o arquivo termine
+sem fechar o comentário, um erro léxico é reportado."
+
+Pergunta 4: "O que acontece se o código tiver um símbolo inválido como '@' ou '$'?"
+Resposta:
+"O compilador adota o modo pânico (descarte local): gera um token de ERRO LÉXICO detalhando
+o caractere inválido, linha e coluna, descarta o símbolo e sincroniza no próximo caractere."
+
+Pergunta 5: "Como a tabela de símbolos será aproveitada na II Unidade?"
+Resposta:
+"Nesta I Unidade registramos lexemas e primeiras ocorrências. Na II Unidade, com o analisador
+sintático SLR(1) e o semântico, essa mesma tabela receberá tipo de dado (integer, real),
+escopo léxico e parâmetros de procedimentos."
+
+
+3. CHECKLIST RÁPIDO ANTES DE SUBIR PARA APRESENTAR
+--------------------------------------------------------------------------------
+[ ] Testar se o arquivo 'MiniPascalLexer.exe' abre normalmente na máquina de apresentação.
+[ ] Deixar o diagrama visual 'diagrama_afd.png' aberto em segundo plano para exibição.
+[ ] Verificar se o som/projetor está conectado.
+[ ] Manter o roteiro mental: Objetivo -> AFD/Lookahead -> Tabela Hash -> Demo ao Vivo.
+
+================================================================================
+Trabalho elaborado por: GUILHERME DIAS SOUSA | Compiladores - UESB
+================================================================================

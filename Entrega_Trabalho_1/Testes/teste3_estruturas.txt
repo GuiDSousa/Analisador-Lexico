@@ -1,0 +1,17 @@
+program EstruturasDeControle;
+var a, b, cont: integer;
+letra: char;
+msg: string;
+begin
+letra := 'A';
+msg := "Testando repeticoes e condicionais";
+a := 1;
+b := 10;
+while (a < b) do
+begin
+a := a + 1;
+end;
+repeat
+b := b - 1;
+until (b <= 0 or not a);
+end.

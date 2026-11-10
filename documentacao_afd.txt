@@ -1,0 +1,211 @@
+================================================================================
+UNIVERSIDADE ESTADUAL DO SUDOESTE DA BAHIA - UESB
+DEPARTAMENTO DE CIÊNCIAS EXATAS - DCET
+CURSO: CIÊNCIA DA COMPUTAÇÃO
+DISCIPLINA: COMPILADORES (2026.2)
+DOCENTE: PROF. JOSÉ CARLOS MARTINS OLIVEIRA
+DISCENTE: GUILHERME DIAS SOUSA
+================================================================================
+DOCUMENTAÇÃO DO AUTÔMATO FINITO DETERMINÍSTICO (AFD)
+Analisador Léxico da Linguagem Mini_Pascal (Trabalho Prático da I Unidade)
+================================================================================
+
+1. INTRODUÇÃO TEÓRICA AO AFD NO ANALISADOR LÉXICO
+--------------------------------------------------------------------------------
+O analisador léxico é a primeira fase de um compilador. Sua função principal é
+ler o fluxo de caracteres do programa-fonte e agrupá-los em sequências significativas
+chamadas "lexemas", associando a cada lexema uma categoria sintática denominada "token".
+
+Para realizar esse reconhecimento de forma determinística, rápida e sem ambiguidades,
+utiliza-se um Autômato Finito Determinístico (AFD).
+
+Formalmente, um AFD é definido por uma 5-tupla:
+    M = (Q, Σ, δ, q0, F)
+Onde:
+    - Q: Conjunto finito de estados do autômato.
+    - Σ: Alfabeto de entrada (conjunto de caracteres aceitos pela linguagem).
+    - δ: Função de transição de estados: Q × Σ -> Q.
+    - q0: Estado inicial (q0 ∈ Q).
+    - F: Conjunto de estados de aceitação/finais (F ⊆ Q), onde cada estado final
+         reconhece um token específico e, quando indicado por (*), retrai o ponteiro
+         de leitura do arquivo em 1 posição (lookahead).
+
+
+2. DEFINIÇÃO FORMAL DOS COMPONENTES DO AFD DO MINI_PASCAL
+--------------------------------------------------------------------------------
+
+A) ESTADO INICIAL:
+   q0
+
+B) CONJUNTO DE ESTADOS (Q):
+   - q0: Estado inicial neutro (leitura de espaços, pontuação, início de tokens).
+   - q1: Após ler '/' (pode ser operador de divisão ou início de comentário '/*').
+   - q2: Dentro de comentário de bloco '/* ...'.
+   - q3: Dentro de comentário após ler '*' (esperando '/' para fechar comentário).
+   - q4: Lendo identificador ou palavra reservada (letra ou sublinhado).
+   - q5: Lendo dígitos inteiros (número inteiro).
+   - q6: Após ler ponto decimal '.' em um número (esperando dígito fracionário).
+   - q7: Lendo dígitos da parte fracionária (número real).
+   - q8: Após ler 'e' ou 'E' (início da notação científica).
+   - q9: Após ler sinal '+' ou '-' no expoente científico.
+   - q10: Lendo dígitos do expoente científico (número real).
+   - q11: Lendo constante string após ler aspas duplas '"'.
+   - q12: Lendo constante caractere após ler aspas simples "'".
+   - q13: Após ler caractere único dentro das aspas simples (esperando fechar "'").
+   - q14: Após ler ':' (pode ser atribuição ':=' ou delimitador ':').
+   - q15: Após ler '<' (pode ser '<', '<=' ou '<>').
+   - q16: Após ler '>' (pode ser '>' ou '>=').
+   - Estados de Aceitação / Finais (F):
+     * q_id_final (*): Reconhece Identificador ou Palavra Reservada (com lookup na tabela).
+     * q_int_final (*): Reconhece Número Inteiro.
+     * q_real_final (*): Reconhece Número Real (fracionário ou exponencial).
+     * q_str_final: Reconhece Constante String.
+     * q_char_final: Reconhece Constante Caractere.
+     * q_atrib: Reconhece Atribuição (:=).
+     * q_dois_pontos (*): Reconhece Símbolo Especial (:).
+     * q_rel_menor (*): Reconhece Operador Relacional (<).
+     * q_rel_menor_igual: Reconhece Operador Relacional (<=).
+     * q_rel_dif: Reconhece Operador Relacional (<>).
+     * q_rel_maior (*): Reconhece Operador Relacional (>).
+     * q_rel_maior_igual: Reconhece Operador Relacional (>=).
+     * q_rel_igual: Reconhece Operador Relacional / Símbolo Especial (=).
+     * q_op_soma: Reconhece Operador Aritmético (+).
+     * q_op_sub: Reconhece Operador Aritmético (-).
+     * q_op_mult: Reconhece Operador Aritmético (*).
+     * q_op_div (*): Reconhece Operador Aritmético (/).
+     * q_abre_par: Reconhece Símbolo Especial (().
+     * q_fecha_par: Reconhece Símbolo Especial ()).
+     * q_virgula: Reconhece Símbolo Especial (,).
+     * q_ponto_virgula: Reconhece Símbolo Especial (;).
+     * q_ponto: Reconhece Fim / Símbolo Especial (.).
+     * q_erro: Estado de Erro Léxico (caractere inválido ou token malformado).
+
+   Nota: O asterisco (*) indica que houve leitura antecipada de um caractere
+   delimitador que não pertence ao token atual; logo, o ponteiro de leitura
+   é retraído em uma posição para que esse caractere seja processado no próximo token.
+
+
+3. TABELA COMPLETA DE TRANSIÇÃO DE ESTADOS (δ)
+--------------------------------------------------------------------------------
+Estado Atual | Entrada (Caractere Lido)         | Próximo Estado | Ação / Token
+--------------------------------------------------------------------------------
+q0           | Espaço, Tab, Quebra de Linha    | q0             | Descartar
+q0           | '/'                             | q1             | Início '/' ou comentário
+q0           | Letra [a-zA-Z] ou '_'           | q4             | Início Identificador/PR
+q0           | Dígito [0-9]                    | q5             | Início Número
+q0           | '"' (aspas duplas)              | q11            | Início Constante String
+q0           | "'" (aspas simples)             | q12            | Início Constante Char
+q0           | ':'                             | q14            | Início ':=' ou ':'
+q0           | '<'                             | q15            | Início '<', '<=', '<>'
+q0           | '>'                             | q16            | Início '>', '>='
+q0           | '='                             | q_rel_igual    | Aceita "="
+q0           | '+'                             | q_op_soma      | Aceita "+"
+q0           | '-'                             | q_op_sub       | Aceita "-"
+q0           | '*'                             | q_op_mult      | Aceita "*"
+q0           | '('                             | q_abre_par     | Aceita "("
+q0           | ')'                             | q_fecha_par    | Aceita ")"
+q0           | ','                             | q_virgula      | Aceita ","
+q0           | ';'                             | q_ponto_virgula| Aceita ";"
+q0           | '.'                             | q_ponto        | Aceita "."
+q0           | Outro caractere                 | q_erro         | Caractere desconhecido
+--------------------------------------------------------------------------------
+[Comentários e Divisão]
+q1           | '*'                             | q2             | Entra em comentário /*
+q1           | Outro caractere                 | q_op_div (*)   | Aceita "/" (Retrai 1)
+q2           | '*'                             | q3             | Possível fim de comentário
+q2           | EOF (Fim de Arquivo)            | q_erro         | Erro: Comentário não fechado
+q2           | Qualquer outro                  | q2             | Permanece no comentário
+q3           | '/'                             | q0             | Fecha comentário '*/' -> volta ao início
+q3           | '*'                             | q3             | Permanece esperando '/'
+q3           | EOF                             | q_erro         | Erro: Comentário não fechado
+q3           | Qualquer outro                  | q2             | Retorna ao corpo do comentário
+--------------------------------------------------------------------------------
+[Identificadores e Palavras Reservadas]
+q4           | Letra [a-zA-Z], Dígito [0-9], '_'| q4            | Continua acumulando lexema
+q4           | Outro caractere                 | q_id_final (*) | Aceita Id/PR (Retrai 1)
+             |                                 |                | -> Consulta tabela hash de PR
+--------------------------------------------------------------------------------
+[Números Inteiros e Reais]
+q5           | Dígito [0-9]                    | q5             | Continua acumulando inteiros
+q5           | '.'                             | q6             | Ponto decimal detectado
+q5           | 'e' ou 'E'                      | q8             | Notação científica
+q5           | Outro caractere                 | q_int_final (*)| Aceita Número Inteiro (Retrai 1)
+q6           | Dígito [0-9]                    | q7             | Dígitos após o ponto
+q6           | Outro caractere                 | q_erro         | Erro: Ponto sem dígitos
+q7           | Dígito [0-9]                    | q7             | Continua parte fracionária
+q7           | 'e' ou 'E'                      | q8             | Notação científica
+q7           | Outro caractere                 | q_real_final(*)| Aceita Número Real (Retrai 1)
+q8           | '+' ou '-'                      | q9             | Sinal do expoente
+q8           | Dígito [0-9]                    | q10            | Dígito direto do expoente
+q8           | Outro caractere                 | q_erro         | Erro: Expoente malformado
+q9           | Dígito [0-9]                    | q10            | Primeiro dígito do expoente
+q9           | Outro caractere                 | q_erro         | Erro: Sinal sem dígito
+q10          | Dígito [0-9]                    | q10            | Continua dígitos do expoente
+q10          | Outro caractere                 | q_real_final(*)| Aceita Número Real (Retrai 1)
+--------------------------------------------------------------------------------
+[Literais: String e Caractere]
+q11          | '"'                             | q_str_final    | Aceita Constante String
+q11          | '\n' ou EOF                    | q_erro         | Erro: String não fechada na linha
+q11          | Qualquer outro                  | q11            | Acumula conteúdo da string
+q12          | Qualquer caractere (exceto \n,')| q13           | Armazena o único caractere
+q12          | "'" ou '\n' ou EOF             | q_erro         | Erro: Char vazio ou quebra
+q13          | "'"                             | q_char_final   | Aceita Constante Caractere
+q13          | Qualquer outro                  | q_erro         | Erro: Char com mais de 1 caractere
+--------------------------------------------------------------------------------
+[Dois Pontos e Atribuição]
+q14          | '='                             | q_atrib        | Aceita Atribuição ":="
+q14          | Outro caractere                 | q_dois_pontos(*| Aceita Símbolo Especial ":" (Retrai 1)
+--------------------------------------------------------------------------------
+[Operadores Relacionais]
+q15          | '='                             | q_rel_menor_igu| Aceita Operador "<="
+q15          | '>'                             | q_rel_dif      | Aceita Operador "<>"
+q15          | Outro caractere                 | q_rel_menor (*)| Aceita Operador "<" (Retrai 1)
+q16          | '='                             | q_rel_maior_igu| Aceita Operador ">="
+q16          | Outro caractere                 | q_rel_maior (*)| Aceita Operador ">" (Retrai 1)
+================================================================================
+
+
+4. TABELA DE PALAVRAS RESERVADAS (LOOKUP NO ESTADO q_id_final)
+--------------------------------------------------------------------------------
+Quando o autômato atinge o estado q_id_final (*), a cadeia acumulada é convertida
+para maiúsculas (ou comparada de forma case-insensitive) contra a tabela pré-definida:
+
+1. ABSOLUTE      13. GOTO           25. OF           37. STRING
+2. ARRAY         14. IF             26. PACKED       38. THEN
+3. BEGIN         15. IMPLEMENTATION 27. PROC         39. TO
+4. CASE          16. INTEGER        28. PROGRAM      40. TYPE
+5. CHAR          17. INTERFACE      29. REAL         41. UNIT
+6. CONST         18. INTERRUPT      30. RECORD       42. UNTIL
+7. DIV           19. LABEL          31. REPEAT       43. USES
+8. DO            20. MAIN           32. SET          44. VAR
+9. DOWTO         21. NIL            33. SHL          45. WHILE
+10. ELSE         22. NIT            34. SHR          46. WITH
+11. END          23. NOT            35. STATIC       47. XOR
+12. FOR          24. OBJECT         36. STEP
+
+Regras de Classificação em q_id_final:
+- Se lexema ∈ {DIV, MOD}: Classificado como "Operador aritmético".
+- Se lexema ∈ {AND, OR, NOT, XOR}: Classificado como "Operador lógico".
+- Se lexema ∈ {Lista de Palavras Reservadas}: Classificado como "Palavra reservada".
+- Caso contrário: Classificado como "Identificador".
+
+
+5. TRATAMENTO DE ERROS LÉXICOS
+--------------------------------------------------------------------------------
+O analisador léxico detecta e reporta com precisão (Linha e Coluna) as seguintes
+categorias de erro:
+a) Caractere desconhecido: Qualquer símbolo que não pertença ao alfabeto Σ (ex.: '@', '$', '&').
+b) Comentário de bloco não fechado: Chegada ao fim de arquivo (EOF) em q2 ou q3 sem a sequência '*/'.
+c) Constante string não fechada: Ocorrência de fim de linha ou EOF em q11 sem fechar as aspas duplas.
+d) Constante caractere malformada: Constante vazia ('') ou contendo mais de um caractere ('ab').
+e) Número real malformado: Ponto decimal sem dígitos subsequentes (ex.: "12.") ou expoente sem dígitos (ex.: "12.5e").
+
+Estratégia de Recuperação:
+Ao encontrar um erro, o analisador registra o erro léxico na saída (com indicação
+de linha e coluna), descarta o caractere inválido ou sincroniza no próximo delimitador
+válido, e retorna ao estado inicial q0 para continuar a análise dos tokens seguintes.
+
+================================================================================
+Trabalho elaborado por: GUILHERME DIAS SOUSA
+Disciplina: Compiladores - UESB
+================================================================================

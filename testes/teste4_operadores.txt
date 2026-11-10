@@ -1,0 +1,14 @@
+program OperadoresEOperacoes;
+var n1, n2, resultado: real;
+r_int: integer;
+flag: integer;
+begin
+n1 := 24.40e-04;
+n2 := 1.33;
+resultado := (n1 + n2) * 5.0 / 2.0;
+r_int := 10 mod 3;
+if (n1 >= n2 and n2 <> 0.0) then
+flag := 1;
+else
+flag := 0;
+end.

@@ -1,0 +1,36 @@
+﻿program Palavra reservada
+TesteDeErros Identificador
+; Símbolo especial
+var Palavra reservada
+x Identificador
+, Símbolo especial
+y Identificador
+: Símbolo especial
+integer Palavra reservada
+; Símbolo especial
+begin Palavra reservada
+x Identificador
+:= Atribuição
+10 Número inteiro
+@ ERRO LÉXICO (Linha 5, Coluna 9: Caractere inválido ou desconhecido: '@')
+20 Número inteiro
+; Símbolo especial
+y Identificador
+:= Atribuição
+5 Número inteiro
+$ ERRO LÉXICO (Linha 6, Coluna 8: Caractere inválido ou desconhecido: '$')
+2 Número inteiro
+; Símbolo especial
+str Identificador
+:= Atribuição
+esta string nao fecha antes do fim ERRO LÉXICO (Linha 7, Coluna 8: Constante string não fechada antes do término da linha.)
+ch Identificador
+:= Atribuição
+'caractere_longo_invalido' ERRO LÉXICO (Linha 8, Coluna 7: Constante caractere inválida: deve conter exatamente um caractere.)
+; Símbolo especial
+num_ruim Identificador
+:= Atribuição
+12.34e+ ERRO LÉXICO (Linha 9, Coluna 13: Número real malformado: expoente científico sem dígitos.)
+; Símbolo especial
+end Palavra reservada
+. Fim
